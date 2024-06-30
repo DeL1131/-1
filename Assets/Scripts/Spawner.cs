@@ -1,36 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private GameObject _prefab;
+    [SerializeField] private Cube _prefab;
     [SerializeField] private GameObject _startPoint;
     [SerializeField] private float _repeatRate;
     [SerializeField] private int _poolCapacity;
     [SerializeField] private int _poolMaxSize;
     [SerializeField] private int _spawnRadius;
 
-    private ObjectPool<GameObject> _pool;
+    private ObjectPool<Cube> _pool;
 
     private void Awake()
     {
-        _pool = new ObjectPool<GameObject>(
+        _pool = new ObjectPool<Cube>(
             createFunc: () => Instantiate(_prefab),
-            actionOnGet: (obj) => ActionOnGet(obj),
-            actionOnRelease: (obj) => obj.SetActive(false),
-            actionOnDestroy: (obj) => Destroy(obj),
+            actionOnGet: (cube) => ActionOnGet(cube),
+            actionOnRelease: (cube) => cube.gameObject.SetActive(false),
+            actionOnDestroy: (cube) => Destroy(cube.gameObject),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize);
     }
 
-    private void ActionOnGet(GameObject obj)
+    private void ActionOnGet(Cube cube)
     {
-        obj.transform.position = Random.insideUnitSphere * _spawnRadius + _startPoint.transform.position;
-        obj.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        obj.SetActive(true);
+        cube.gameObject.transform.position = Random.insideUnitSphere * _spawnRadius + _startPoint.transform.position;
+
+        cube.gameObject.SetActive(true);
     }
 
     private void Start()
@@ -41,5 +39,10 @@ public class Spawner : MonoBehaviour
     private void GetSphere()
     {
         _pool.Get();
+    }
+
+    private void ReturnToPool(Cube cube)
+    {
+        _pool.Release(cube);
     }
 }
