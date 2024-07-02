@@ -26,6 +26,7 @@ public class Spawner : MonoBehaviour
 
     private void ActionOnGet(Cube cube)
     {
+        cube.ReturnToPool += ReturnToPool;
         cube.gameObject.transform.position = Random.insideUnitSphere * _spawnRadius + _startPoint.transform.position;
 
         cube.gameObject.SetActive(true);
@@ -43,6 +44,7 @@ public class Spawner : MonoBehaviour
 
     private void ReturnToPool(Cube cube)
     {
+        cube.ReturnToPool -= ReturnToPool;
         _pool.Release(cube);
     }
 }

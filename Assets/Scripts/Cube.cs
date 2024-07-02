@@ -1,5 +1,5 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Renderer))]
@@ -8,27 +8,29 @@ public class Cube : MonoBehaviour
 {
     private float _maxLifeTime = 6;
     private float _lifeTime;
+    private bool _isColideWall;
 
+    public event Action<Cube> ReturnToPool;
+    private Spawner _spawner;
     private Renderer _renderer;
-    private HashSet<GameObject> _collidedWalls;
 
     private void Start()
-    {       
-        _collidedWalls = new HashSet<GameObject>();
+    {
+        _renderer = GetComponent<Renderer>();
+    }
+
+    private void OnEnable()
+    {
+        _isColideWall = false;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.TryGetComponent(out Wall _))
+        if (collision.gameObject.TryGetComponent(out Wall _) && _isColideWall == false)
         {
-            if (_collidedWalls.Contains(collision.gameObject))
-            {
-                return;
-            }
-
+            _isColideWall = true;
             ChangeColor();
-            _collidedWalls.Add(collision.gameObject);
-            _lifeTime = Random.Range(0, _maxLifeTime);
+            _lifeTime = UnityEngine.Random.Range(0, _maxLifeTime);
             StartCoroutine(Destroy());
         }
     }
@@ -36,12 +38,12 @@ public class Cube : MonoBehaviour
     private IEnumerator Destroy()
     {
         yield return new WaitForSeconds(_lifeTime);
-        Destroy(gameObject);
+        _renderer.material.color = Color.white;
+        ReturnToPool?.Invoke(this);
     }
-
+     
     private void ChangeColor()
     {
-        _renderer = GetComponent<Renderer>();
         _renderer.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
     }
 }
