@@ -10,9 +10,10 @@ public class Cube : MonoBehaviour
     private float _lifeTime;
     private bool _isColideWall;
 
-    public event Action<Cube> ReturnToPool;
     private Spawner _spawner;
     private Renderer _renderer;
+
+    public event Action<Cube> ReturnToPool;
 
     private void Start()
     {
@@ -31,11 +32,11 @@ public class Cube : MonoBehaviour
             _isColideWall = true;
             ChangeColor();
             _lifeTime = UnityEngine.Random.Range(0, _maxLifeTime);
-            StartCoroutine(Destroy());
+            StartCoroutine(DestroyDelayed());
         }
     }
 
-    private IEnumerator Destroy()
+    private IEnumerator DestroyDelayed()
     {
         yield return new WaitForSeconds(_lifeTime);
         _renderer.material.color = Color.white;

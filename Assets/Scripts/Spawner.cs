@@ -1,15 +1,16 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private Cube _prefab;
-    [SerializeField] private GameObject _startPoint;
+    [SerializeField] private Spawner _startPoint;
     [SerializeField] private float _repeatRate;
     [SerializeField] private int _poolCapacity;
-    [SerializeField] private int _poolMaxSize;
     [SerializeField] private int _spawnRadius;
 
+    private bool _isWork = true;
     private ObjectPool<Cube> _pool;
 
     private void Awake()
@@ -20,8 +21,7 @@ public class Spawner : MonoBehaviour
             actionOnRelease: (cube) => cube.gameObject.SetActive(false),
             actionOnDestroy: (cube) => Destroy(cube.gameObject),
             collectionCheck: true,
-            defaultCapacity: _poolCapacity,
-            maxSize: _poolMaxSize);
+            defaultCapacity: _poolCapacity);
     }
 
     private void ActionOnGet(Cube cube)
@@ -34,12 +34,16 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        InvokeRepeating(nameof(GetSphere), 0.0f, _repeatRate);
+        StartCoroutine(GetSphere());
     }
 
-    private void GetSphere()
+    private IEnumerator GetSphere()
     {
-        _pool.Get();
+        while (_isWork)
+        {
+            yield return new WaitForSeconds(_repeatRate);
+            _pool.Get();
+        }
     }
 
     private void ReturnToPool(Cube cube)
