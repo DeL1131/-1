@@ -611,10 +611,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _prefab: {fileID: 5860367330941706383, guid: b93e76040f8ad3c478e36145f0802e20, type: 3}
-  _startPoint: {fileID: 1472038621}
-  _repeatRate: 0.3
+  _repeatRate: 0.1
   _poolCapacity: 5
-  _poolMaxSize: 5
   _spawnRadius: 10
 --- !u!4 &1472038624
 Transform:
