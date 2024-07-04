@@ -5,7 +5,6 @@ using UnityEngine.Pool;
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private Cube _prefab;
-    [SerializeField] private Spawner _startPoint;
     [SerializeField] private float _repeatRate;
     [SerializeField] private int _poolCapacity;
     [SerializeField] private int _spawnRadius;
@@ -17,17 +16,17 @@ public class Spawner : MonoBehaviour
     {
         _pool = new ObjectPool<Cube>(
             createFunc: () => Instantiate(_prefab),
-            actionOnGet: (cube) => ActionOnGet(cube),
+            actionOnGet: (cube) => GetElement(cube),
             actionOnRelease: (cube) => cube.gameObject.SetActive(false),
             actionOnDestroy: (cube) => Destroy(cube.gameObject),
             collectionCheck: true,
             defaultCapacity: _poolCapacity);
     }
 
-    private void ActionOnGet(Cube cube)
+    private void GetElement(Cube cube)
     {
         cube.ReturnToPool += ReturnToPool;
-        cube.gameObject.transform.position = Random.insideUnitSphere * _spawnRadius + _startPoint.transform.position;
+        cube.gameObject.transform.position = Random.insideUnitSphere * _spawnRadius + transform.position;
 
         cube.gameObject.SetActive(true);
     }
@@ -39,9 +38,11 @@ public class Spawner : MonoBehaviour
 
     private IEnumerator GetSphere()
     {
+        WaitForSeconds waitForSeconds = new WaitForSeconds(_repeatRate);
+
         while (_isWork)
         {
-            yield return new WaitForSeconds(_repeatRate);
+            yield return waitForSeconds;
             _pool.Get();
         }
     }

@@ -7,10 +7,8 @@ using UnityEngine;
 public class Cube : MonoBehaviour
 {
     private float _maxLifeTime = 6;
-    private float _lifeTime;
     private bool _isColideWall;
 
-    private Spawner _spawner;
     private Renderer _renderer;
 
     public event Action<Cube> ReturnToPool;
@@ -31,20 +29,20 @@ public class Cube : MonoBehaviour
         {
             _isColideWall = true;
             ChangeColor();
-            _lifeTime = UnityEngine.Random.Range(0, _maxLifeTime);
-            StartCoroutine(DestroyDelayed());
+            float lifeTime = UnityEngine.Random.Range(0, _maxLifeTime);
+            StartCoroutine(DestroyDelayed(lifeTime));
         }
     }
 
-    private IEnumerator DestroyDelayed()
-    {
-        yield return new WaitForSeconds(_lifeTime);
-        _renderer.material.color = Color.white;
-        ReturnToPool?.Invoke(this);
-    }
-     
     private void ChangeColor()
     {
-        _renderer.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+        _renderer.material.color = UnityEngine.Random.ColorHSV();
+    }
+
+    private IEnumerator DestroyDelayed(float lifeTime)
+    {
+        yield return new WaitForSeconds(lifeTime);
+        _renderer.material.color = Color.white;
+        ReturnToPool?.Invoke(this);
     }
 }
