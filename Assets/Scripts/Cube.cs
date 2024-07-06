@@ -11,7 +11,7 @@ public class Cube : MonoBehaviour
 
     private Renderer _renderer;
 
-    public event Action<Cube> ReturnToPool;
+    public event Action<Cube> ReturningToPool;
 
     private void Start()
     {
@@ -43,6 +43,6 @@ public class Cube : MonoBehaviour
     {
         yield return new WaitForSeconds(lifeTime);
         _renderer.material.color = Color.white;
-        ReturnToPool?.Invoke(this);
+        ReturningToPool?.Invoke(this);
     }
 }

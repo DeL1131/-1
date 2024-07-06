@@ -16,27 +16,19 @@ public class Spawner : MonoBehaviour
     {
         _pool = new ObjectPool<Cube>(
             createFunc: () => Instantiate(_prefab),
-            actionOnGet: (cube) => GetElement(cube),
+            actionOnGet: (cube) => ActivateOnGet(cube),
             actionOnRelease: (cube) => cube.gameObject.SetActive(false),
             actionOnDestroy: (cube) => Destroy(cube.gameObject),
             collectionCheck: true,
             defaultCapacity: _poolCapacity);
     }
 
-    private void GetElement(Cube cube)
-    {
-        cube.ReturnToPool += ReturnToPool;
-        cube.gameObject.transform.position = Random.insideUnitSphere * _spawnRadius + transform.position;
-
-        cube.gameObject.SetActive(true);
-    }
-
     private void Start()
     {
-        StartCoroutine(GetSphere());
+        StartCoroutine(SpawnObjects());
     }
 
-    private IEnumerator GetSphere()
+    private IEnumerator SpawnObjects()
     {
         WaitForSeconds waitForSeconds = new WaitForSeconds(_repeatRate);
 
@@ -47,9 +39,17 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    private void ActivateOnGet(Cube cube)
+    {
+        cube.ReturningToPool += ReturnToPool;
+        cube.gameObject.transform.position = Random.insideUnitSphere * _spawnRadius + transform.position;
+
+        cube.gameObject.SetActive(true);
+    }
+
     private void ReturnToPool(Cube cube)
     {
-        cube.ReturnToPool -= ReturnToPool;
+        cube.ReturningToPool -= ReturnToPool;
         _pool.Release(cube);
     }
 }
